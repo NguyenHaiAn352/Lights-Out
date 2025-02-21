@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1739946347 source:c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\main.cpp
+	<iostream>
+	<SDL.h>
+	<SDL_image.h>
+
