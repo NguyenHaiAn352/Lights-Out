@@ -9,7 +9,7 @@
 struct Graphics {
     SDL_Renderer *renderer;
     SDL_Window *window;
-    SDL_Texture *cellEmpty, *cellX, *cellO;
+    SDL_Texture *cellEmpty, *cellX, *cellO, *lightOn;
     void logErrorAndExit(const char* msg, const char* error)
     {
         SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR,
@@ -48,6 +48,7 @@ struct Graphics {
         cellEmpty = loadTexture("images//cell_empty.png");
         cellX = loadTexture("images//cell_x.png");
         cellO = loadTexture("images//cell_o.png");
+        lightOn = loadTexture("images//light_on.png");
     }
 
     void prepareScene(SDL_Texture * background)
@@ -92,6 +93,8 @@ struct Graphics {
         cellO = nullptr;
         SDL_DestroyTexture(cellX);
         cellX = nullptr;
+        SDL_DestroyTexture(lightOn);
+        lightOn = nullptr;
 
         IMG_Quit();
         SDL_DestroyRenderer(renderer);
@@ -99,7 +102,7 @@ struct Graphics {
         SDL_Quit();
     }
 
-     void render(const Tictactoe& game) {
+     void render(const Lightsout& game) {
         //prepareScene();
          for (int i = 0; i < BOARD_SIZE; i++)
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -109,6 +112,7 @@ struct Graphics {
                     case EMPTY_CELL: renderTexture(cellEmpty, x, y); break;
                     case X_CELL: renderTexture(cellX, x, y); break;
                     case O_CELL: renderTexture(cellO, x, y); break;
+                    case LIGHTED: renderTexture(lightOn, x, y); break;
                 };
             };
 
