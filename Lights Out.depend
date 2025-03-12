@@ -1,19 +1,25 @@
 # depslib dependency file v1.0
-1741587768 source:c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\main.cpp
+1741756098 source:c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\main.cpp
 	<iostream>
+	<cstdlib>
+	<ctime>
+	<set>
 	<SDL.h>
 	<SDL_image.h>
 	"defs.h"
 	"graphics.h"
 	"logic.h"
+	"additional.h"
 
-1740413861 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\defs.h
+1741595411 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\defs.h
 
-1741587761 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\graphics.h
+1741760202 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\graphics.h
 	<SDL.h>
 	<SDL_image.h>
 	"defs.h"
 	"logic.h"
 
-1741588123 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\logic.h
+1741759120 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\logic.h
+
+1741700891 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\additional.h
 

@@ -1,4 +1,7 @@
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <set>
 #include <SDL.h>
 #include <SDL_image.h>
 #include "defs.h"
@@ -20,34 +23,37 @@ void waitUntilKeyPressed() //pause coding until key being pressed
 }
 
 void processClick(int x, int y, Lightsout& game) {
+    if (x > 10 && x < 10 + 240 && y > 10*2 + CELL_SIZE*BOARD_SIZE && y < 10*2 + CELL_SIZE*BOARD_SIZE + 80) {
+        game.giveHint();
+    }
+    else {
     // chuyển tọa độ màn hình x, y thành tọa độ hàng cột của game
     int clickedCol = (x - BOARD_X) / CELL_SIZE;
     int clickedRow = (y - BOARD_Y) / CELL_SIZE;
     game.move(clickedRow, clickedCol);
+    }
 }
 
 
 int main(int argc, char *argv[])
 {
+
+//    int input;
+//    cout << "Select your board size: 3   4   5";
+//    cin >> input;
+//
+//    int BOARD_SIZE = input;
+
     Graphics graphics;
     graphics.init();
 
     Lightsout game;
     game.init();
+    game.gameInit();
+
     graphics.render(game);
 
     int x, y;
-
-//    bool CLICK_STATE[BOARD_SIZE][BOARD_SIZE];
-//    for (int i = 0; i < BOARD_SIZE; i++){
-//        for (int j = 0; j < BOARD_SIZE; j++){
-//            CLICK_STATE[i][j] = 0;
-//        }
-//    }
-
-    Additional dlc;
-    dlc.init();
-
     SDL_Event event;
     bool quit = false;
     while (! quit) {
@@ -59,8 +65,6 @@ int main(int argc, char *argv[])
             case SDL_MOUSEBUTTONDOWN:
                  SDL_GetMouseState(&x, &y);
                  processClick(x, y, game);
-//                 internalClickTracker(x, y, game, CLICK_STATE);
-                 dlc.internalLightState(x, y);
                  graphics.render(game);
                  break;
         }
