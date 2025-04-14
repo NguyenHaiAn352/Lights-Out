@@ -119,9 +119,6 @@ struct Lightsout {
     void congratulation(){
         haveWon = true;
     }
-    void reset(){
-        uniqueNumbers.clear();
-    }
 };
 
 

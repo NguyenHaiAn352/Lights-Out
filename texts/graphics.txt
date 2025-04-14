@@ -13,20 +13,18 @@ struct Graphics {
     SDL_Texture *cellEmpty, *helpBox, *lightOn;
     SDL_Texture *zero, *one, *two, *three, *four, *five, *six, *seven, *eight, *nine;
     SDL_Texture *backgroundTest, *backgroundTestTwo;
-    SDL_Texture *spongebob;
-    SDL_Texture *congratulationText, *replayBlack, *replayYellow, *quitBlack, *quitYellow;
 
-    TTF_Font* font, *fontTwo;
-    SDL_Color color;
-//    SDL_Texture* congratText, *closeWindow, *closeWindowTwo;
+    TTF_Font* font = loadFont("assets//DkCoolCrayon-xJyV.ttf", 100);
+    SDL_Color color = {255, 255, 0, 0};
+    SDL_Texture* congratText = renderText("You have won!", font, color);
 
     int initX = 0, initY = 0;
     int movingX = 10; int movingY = 10;
     int currentX = 0; int currentY = 0;
 
-    void logErrorAndExit(const char* msg, const char* error)
-    {
-        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "%s: %s", msg, error);
+    void logErrorAndExit(const char* msg, const char* error) {
+        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR,
+                       "%s: %s", msg, error);
         SDL_Quit();
     }
 
@@ -34,40 +32,30 @@ struct Graphics {
         if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
             logErrorAndExit("SDL_Init", SDL_GetError());
 
-        window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-        //full screen
-        //window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_FULLSCREEN_DESKTOP);
-        if (window == nullptr) logErrorAndExit("CreateWindow", SDL_GetError());
+        window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED,
+                   SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT,
+                   SDL_WINDOW_SHOWN);
+        if (window == nullptr)
+                   logErrorAndExit("CreateWindow", SDL_GetError());
 
         if (!IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG))
             logErrorAndExit( "SDL_image error:", IMG_GetError());
 
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED |
-                                              SDL_RENDERER_PRESENTVSYNC);
-        //Khi chạy trong máy ảo (ví dụ phòng máy ở trường)
-        //renderer = SDL_CreateSoftwareRenderer(SDL_GetWindowSurface(window));
+        renderer = SDL_CreateRenderer(window, -1,
+                     SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-        if (renderer == nullptr) logErrorAndExit("CreateRenderer", SDL_GetError());
+        //renderer =
+                  SDL_CreateSoftwareRenderer(SDL_GetWindowSurface(window));
+
+        if (renderer == nullptr)
+             logErrorAndExit("CreateRenderer", SDL_GetError());
 
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
         SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-        if (TTF_Init() == -1) {
-            logErrorAndExit("SDL_ttf could not initialize! SDL_ttf Error: ", TTF_GetError());
-        }
     }
 
     void init(){
         initSDL();
-        spongebob = loadTexture("images//Spongebob.png");
-//        font = loadFont("assets/DKCoolCrayon.ttf", 30);
-//        fontTwo = loadFont("assets/DKCoolCrayon.ttf", 15);
-        congratulationText = loadTexture("texts//CongratulationText.png");
-        quitBlack = loadTexture("texts//QuitButtonBlack.png");
-        quitYellow = loadTexture("texts//QuitButtonYellow.png");
-        replayBlack = loadTexture("texts//ReplayButtonBlack.png");
-        replayYellow = loadTexture("texts//ReplayButtonYellow.png");
-        color = {219, 219, 219, 0};
         cellEmpty = loadTexture("images//cell_empty.png");
         lightOn = loadTexture("images//light_on.png");
         helpBox = loadTexture("images//hint.png");
@@ -83,22 +71,16 @@ struct Graphics {
         nine = loadTexture("images//nine.png");
         backgroundTest = loadTexture("images//background_test.png");
         backgroundTestTwo = loadTexture("images//graybackground.png");
-    }
-
-    TTF_Font* loadFont(const char* path, int size)
-    {
-        TTF_Font* gFont = TTF_OpenFont( path, size );
-        if (gFont == nullptr) {
-            SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION,
-                           SDL_LOG_PRIORITY_ERROR,
-                           "Load font %s", TTF_GetError());
+        if (TTF_Init() == -1) {
+            logErrorAndExit("SDL_ttf could not initialize! SDL_ttf Error: ",
+                             TTF_GetError());
         }
     }
 
     void prepareScene(SDL_Texture * background)
     {
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, background, NULL, NULL);
+        SDL_RenderCopy( renderer, background, NULL, NULL);
     }
 
     void presentScene()
@@ -108,41 +90,27 @@ struct Graphics {
 
     SDL_Texture *loadTexture(const char *filename)
     {
-        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Loading %s", filename);
-
+        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,
+                       "Loading %s", filename);
         SDL_Texture *texture = IMG_LoadTexture(renderer, filename);
         if (texture == NULL)
-            SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "Load texture %s", IMG_GetError());
+            SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION,
+                  SDL_LOG_PRIORITY_ERROR, "Load texture %s", IMG_GetError());
 
         return texture;
     }
 
-    void renderTexture(SDL_Texture *texture, int x, int y)
-    {
+    void renderTexture(SDL_Texture *texture, int x, int y){
         SDL_Rect dest;
-
         dest.x = x;
         dest.y = y;
         SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
-
         SDL_RenderCopy(renderer, texture, NULL, &dest);
     }
 
-    void blitRect(SDL_Texture *texture, SDL_Rect *src, int x, int y)
-    {
-        SDL_Rect dest;
-
-        dest.x = x;
-        dest.y = y;
-        dest.w = src->w;
-        dest.h = src->h;
-
-        SDL_RenderCopy(renderer, texture, src, &dest);
-    }
-
     void quit() {
-        SDL_DestroyTexture(spongebob);
-        spongebob = nullptr;
+        TTF_Quit();
+
         SDL_DestroyTexture(zero);
         zero = nullptr;
         SDL_DestroyTexture(cellEmpty);
@@ -172,12 +140,20 @@ struct Graphics {
         SDL_DestroyTexture(backgroundTestTwo);
         backgroundTest = nullptr;
 
-        TTF_CloseFont(font);
         IMG_Quit();
-        TTF_Quit();
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
+    }
+
+    TTF_Font* loadFont(const char* path, int size)
+    {
+        TTF_Font* gFont = TTF_OpenFont( path, size );
+        if (gFont == nullptr) {
+            SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION,
+                           SDL_LOG_PRIORITY_ERROR,
+                           "Load font %s", TTF_GetError());
+        }
     }
 
     SDL_Texture* renderText(const char* text,
@@ -204,15 +180,11 @@ struct Graphics {
     }
 
      void render(const Lightsout& game) {
-        prepareScene(backgroundTestTwo);
-        if (true){
-            renderTexture(congratulationText, 9, 8);
-            renderTexture(replayBlack, 73, 145);
-            renderTexture(quitBlack, 92, 236);
-            cout << " You should be able to see this message after beating the game (and all other supporting graphics)." << endl;
-            presentScene();
+        //prepareScene();
+        if (game.haveWon){
+            renderTexture(congratText, 10, 10);
         } else {
-            cout << "You are in the game's progress!" << endl;
+            renderTexture(backgroundTestTwo, 0, 0);
              for (int i = 0; i < BOARD_SIZE; i++)
                 for (int j = 0; j < BOARD_SIZE; j++) {
                     int x = BOARD_X + j * CELL_SIZE;
@@ -243,4 +215,3 @@ struct Graphics {
 
 
 #endif // _GRAPHICS__H
-

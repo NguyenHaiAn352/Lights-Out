@@ -1,0 +1,15 @@
+|| MANDATORY FEATURES ||
+
+- Seamless transitioning background (Logic in code with background being 2 times the size of window)
+
+- NxN grid of players' choices?
+=> Will depends on the grid size because 4x4 and 5x5 will have different background scale size to work with the same code logic
+
+- Congratulatory end screen (+ code to exit upon winning and pressing Enter)
+
+- Background music (Should be easy)
+
+|| QUESTIONING FEATURES ||
+
+(- Using sprites to count player's current moves) 
+=> Might be too expensive to copy preexisting sprites, scaling it down and render 2-3 textures every time player make a choice?
