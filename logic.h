@@ -15,8 +15,9 @@ struct Lightsout {
     bool CLICK_STATE [BOARD_SIZE*BOARD_SIZE];
     set <int> uniqueNumbers;
     int blocks = BOARD_SIZE*BOARD_SIZE;
-    int hintPosition = 0;
+    int hintPosition = 0; int lastHintPosition = 0;
     bool haveWon = false;
+    int hintNumbers = 4;
 
     void init() {
         for (int i = 0; i < BOARD_SIZE; i++){
@@ -26,7 +27,6 @@ struct Lightsout {
             CLICK_STATE[i] = 0;
         }
     }
-
     void gameInit(){
         srand(time(0));
         while(uniqueNumbers.size() < 5) {
@@ -41,7 +41,20 @@ struct Lightsout {
         hintPosition = *initPos;
         cout << endl;
     }
-
+    void hardModeInit() {
+        srand(time(0));
+        while(uniqueNumbers.size() < 7) {
+            int randomNumber = rand() % (blocks - 1);
+            if (uniqueNumbers.insert(randomNumber).second) {
+                cout << randomNumber + 1 << " " << endl;
+                int tempRow = randomNumber/3;
+                move(tempRow, randomNumber%3);
+            }
+        }
+        auto initPos = uniqueNumbers.begin();
+        hintPosition = *initPos;
+        cout << endl;
+    }
     void move(int row, int column) {
         CLICK_STATE[row*3+column] = (CLICK_STATE[row*3+column] == 1) ? 0 : 1;
         for (int i = 0; i < blocks; i++){
@@ -94,9 +107,12 @@ struct Lightsout {
         }
     }
     }
-
     void giveHint(){
-        srand(time(0));
+        lastHintPosition = hintPosition;
+        if (hintNumbers == 0) {cout << "You are out of hints!" << endl; hintPosition = 0;}
+        else {
+                hintNumbers--;
+            srand(time(0));
         int temp = rand() % (blocks - 1);
         bool check = false;
 //
@@ -113,14 +129,16 @@ struct Lightsout {
             } while (CLICK_STATE[temp] != 1);
             cout << temp + 1 << " ";
             hintPosition = temp + 1;
+            if (lastHintPosition == hintPosition) hintNumbers++;
         } else {cout << "You have already beaten the game!" << endl; hintPosition = 0;}
+        }
     }
-
     void congratulation(){
         haveWon = true;
     }
     void reset(){
         uniqueNumbers.clear();
+        hintNumbers = 4;
     }
 };
 

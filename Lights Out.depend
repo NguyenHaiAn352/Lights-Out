@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1744625441 source:c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\main.cpp
+1746122686 source:c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\main.cpp
 	<iostream>
 	<cstdlib>
 	<ctime>
@@ -7,20 +7,30 @@
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_ttf.h>
+	<SDL_mixer.h>
 	"defs.h"
 	"graphics.h"
 	"logic.h"
+	"timer.h"
+	<sstream>
+	<iomanip>
+	<cmath>
 
 1744624677 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\defs.h
 
-1744625693 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\graphics.h
+1746122515 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\graphics.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_ttf.h>
+	<SDL_mixer.h>
 	"defs.h"
 	"logic.h"
+	<sstream>
+	"timer.h"
 
-1744565304 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\logic.h
+1745336310 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\logic.h
 
 1741700891 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\additional.h
+
+1745253839 c:\users\admin\onedrive\desktop\lesson resources\advanced programming\lights out\timer.h
 
