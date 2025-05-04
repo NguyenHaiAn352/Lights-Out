@@ -18,6 +18,8 @@ struct Lightsout {
     int hintPosition = 0; int lastHintPosition = 0;
     bool haveWon = false;
     int hintNumbers = 4;
+    int HardModeMoves = 50;
+    bool HardModeLost = false;
 
     void init() {
         for (int i = 0; i < BOARD_SIZE; i++){
@@ -29,7 +31,7 @@ struct Lightsout {
     }
     void gameInit(){
         srand(time(0));
-        while(uniqueNumbers.size() < 5) {
+        while(uniqueNumbers.size() < 7) {
             int randomNumber = rand() % (blocks - 1);
             if (uniqueNumbers.insert(randomNumber).second) {
                 cout << randomNumber + 1 << " " << endl;
@@ -37,8 +39,8 @@ struct Lightsout {
                 move(tempRow, randomNumber%3);
             }
         }
-        auto initPos = uniqueNumbers.begin();
-        hintPosition = *initPos;
+//        auto initPos = uniqueNumbers.begin();
+//        hintPosition = *initPos;
         cout << endl;
     }
     void hardModeInit() {
@@ -54,6 +56,8 @@ struct Lightsout {
         auto initPos = uniqueNumbers.begin();
         hintPosition = *initPos;
         cout << endl;
+        HardModeMoves = 50;
+        HardModeLost = false;
     }
     void move(int row, int column) {
         CLICK_STATE[row*3+column] = (CLICK_STATE[row*3+column] == 1) ? 0 : 1;
@@ -111,7 +115,7 @@ struct Lightsout {
         lastHintPosition = hintPosition;
         if (hintNumbers == 0) {cout << "You are out of hints!" << endl; hintPosition = 0;}
         else {
-                hintNumbers--;
+            hintNumbers--;
             srand(time(0));
         int temp = rand() % (blocks - 1);
         bool check = false;

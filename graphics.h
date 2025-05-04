@@ -13,13 +13,14 @@
 struct Graphics {
     SDL_Renderer *renderer;
     SDL_Window *window;
-    SDL_Texture *cellEmpty, *helpBox, *lightOn, *outOfHint;
+    SDL_Texture *cellEmpty, *helpBox, *lightOn, *outOfHint, *boxHardMode;
     SDL_Texture *zero, *one, *two, *three, *four, *five, *six, *seven, *eight, *nine;
-    SDL_Texture *blackBackground, *backgroundTestTwo, *TitleScreen;
+    SDL_Texture *blackBackground, *backgroundTestTwo, *grayerBackground, *TitleScreen;
     SDL_Texture *spongebob;
-    SDL_Texture *CongratulationText, *ReplayTheGame, *ReplayTheGameYellow, *BackToTitle, *BackToTitleYellow;
+    SDL_Texture *CongratulationText, *loseText, *ReplayTheGame, *ReplayTheGameYellow, *BackToTitle, *BackToTitleYellow;
     SDL_Texture *LightsOutTitle, *StartTheGame, *StartTheGameYellow, *orButton, *PickTheHardMode, *PickTheHardModeYellow;
-    SDL_Texture *HardModeIntro5, *HardModeIntro4,*HardModeIntro3, *HardModeIntro2, *HardModeIntro1;
+    SDL_Texture *Intro5, *Intro4,*Intro3, *Intro2, *Intro1, *HardModeIntro;
+    SDL_Texture *animatedBackgroundBlack, *animatedBackgroundGray;
     TTF_Font* font, *fontTwo;
     SDL_Color color;
 //    SDL_Texture* congratText, *closeWindow, *closeWindowTwo;
@@ -71,6 +72,9 @@ struct Graphics {
         spongebob = loadTexture("images//Spongebob.png");
 //        font = loadFont("assets/DKCoolCrayon.ttf", 30);
 //        fontTwo = loadFont("assets/DKCoolCrayon.ttf", 15);
+        animatedBackgroundBlack = loadTexture("images//animatedBackgroundBlack.png");
+        animatedBackgroundGray = loadTexture("images//animatedBackgroundGray.png");
+        loseText = loadTexture("texts//LoseText.png");
         TitleScreen = loadTexture("images//TitleScreen.png");
         CongratulationText = loadTexture("texts//CongratulationText.png");
         ReplayTheGame = loadTexture("texts//ReplayTheGame.png");
@@ -100,12 +104,14 @@ struct Graphics {
         nine = loadTexture("images//nine.png");
         blackBackground = loadTexture("images//blackBackground.png");
         backgroundTestTwo = loadTexture("images//graybackground.png");
-        HardModeIntro5 = loadTexture("images//HardModeIntro5.png");
-        HardModeIntro4 = loadTexture("images//HardModeIntro4.png");
-        HardModeIntro3 = loadTexture("images//HardModeIntro3.png");
-        HardModeIntro2 = loadTexture("images//HardModeIntro2.png");
-        HardModeIntro1 = loadTexture("images//HardModeIntro1.png");
-
+        HardModeIntro = loadTexture("images//HardModeIntro.png");
+        Intro5 = loadTexture("images//Intro5.png");
+        Intro4 = loadTexture("images//Intro4.png");
+        Intro3 = loadTexture("images//Intro3.png");
+        Intro2 = loadTexture("images//Intro2.png");
+        Intro1 = loadTexture("images//Intro1.png");
+        boxHardMode = loadTexture("images//boxHardMode.png");
+        grayerBackground = loadTexture("images//grayerbackground.png");
         SDL_SetTextureBlendMode(blackBackground, SDL_BLENDMODE_MOD);
         SDL_SetTextureAlphaMod(blackBackground, 255);
 
@@ -177,6 +183,17 @@ struct Graphics {
         return gMusic;
     }
 
+    Mix_Chunk* loadSoundEffect(const char* path) {
+        Mix_Chunk* gSFX = Mix_LoadWAV(path);
+
+        if (!gSFX) {  // More compact check
+            SDL_Log("Could not load sound effect! SDL_mixer Error: %s", Mix_GetError());
+            return nullptr;  // Ensure we return `nullptr` directly
+        }
+
+        return gSFX;
+    }
+
     void play(Mix_Music *gMusic)
     {
         if (gMusic == nullptr) return;
@@ -190,37 +207,31 @@ struct Graphics {
     }
 
     void quit() {
-        SDL_DestroyTexture(spongebob);
-        spongebob = nullptr;
-        SDL_DestroyTexture(zero);
-        zero = nullptr;
-        SDL_DestroyTexture(cellEmpty);
-        cellEmpty = nullptr;
-        SDL_DestroyTexture(lightOn);
-        lightOn = nullptr;
-        SDL_DestroyTexture(one);
-        one = nullptr;
-        SDL_DestroyTexture(two);
-        two = nullptr;
-        SDL_DestroyTexture(three);
-        three = nullptr;
-        SDL_DestroyTexture(four);
-        four = nullptr;
-        SDL_DestroyTexture(five);
-        five = nullptr;
-        SDL_DestroyTexture(six);
-        six = nullptr;
-        SDL_DestroyTexture(seven);
-        seven = nullptr;
-        SDL_DestroyTexture(eight);
-        eight = nullptr;
-        SDL_DestroyTexture(nine);
-        nine = nullptr;
-        SDL_DestroyTexture(blackBackground);
-        blackBackground = nullptr;
-        SDL_DestroyTexture(backgroundTestTwo);
-        backgroundTestTwo = nullptr;
-
+        SDL_DestroyTexture(animatedBackgroundBlack); animatedBackgroundBlack = nullptr;
+        SDL_DestroyTexture(animatedBackgroundGray); animatedBackgroundGray = nullptr;
+        SDL_DestroyTexture(loseText); loseText = nullptr;
+        SDL_DestroyTexture(Intro5); Intro5 = nullptr;
+        SDL_DestroyTexture(Intro4); Intro4 = nullptr;
+        SDL_DestroyTexture(Intro3); Intro3 = nullptr;
+        SDL_DestroyTexture(Intro2); Intro2 = nullptr;
+        SDL_DestroyTexture(Intro1); Intro1 = nullptr;
+        SDL_DestroyTexture(HardModeIntro); HardModeIntro = nullptr;
+        SDL_DestroyTexture(zero); zero = nullptr;
+        SDL_DestroyTexture(cellEmpty); cellEmpty = nullptr;
+        SDL_DestroyTexture(lightOn); lightOn = nullptr;
+        SDL_DestroyTexture(one); one = nullptr;
+        SDL_DestroyTexture(two); two = nullptr;
+        SDL_DestroyTexture(three); three = nullptr;
+        SDL_DestroyTexture(four); four = nullptr;
+        SDL_DestroyTexture(five); five = nullptr;
+        SDL_DestroyTexture(six); six = nullptr;
+        SDL_DestroyTexture(seven); seven = nullptr;
+        SDL_DestroyTexture(eight); eight = nullptr;
+        SDL_DestroyTexture(nine); nine = nullptr;
+        SDL_DestroyTexture(blackBackground); blackBackground = nullptr;
+        SDL_DestroyTexture(backgroundTestTwo); backgroundTestTwo = nullptr;
+        SDL_DestroyTexture(boxHardMode); boxHardMode = nullptr;
+        SDL_DestroyTexture(grayerBackground); grayerBackground = nullptr;
         TTF_CloseFont(font);
         IMG_Quit();
         TTF_Quit();
@@ -252,13 +263,53 @@ struct Graphics {
         return texture;
     }
 
+    void renderAnimatedBackgroundBlack(LTimer &countdown, int &yPos) {
+        int moveDistance = 10; // Move the texture up, making it appear like the background moves downward
+
+        if (countdown.getTicks() % 850 < 12.3) {
+            yPos -= moveDistance; // Move texture upward
+
+            // Render first texture
+            renderTexture(animatedBackgroundBlack, 0, yPos);
+
+            // Render second texture to create a smooth transition
+            renderTexture(animatedBackgroundBlack, 0, yPos + 700);
+
+            // Reset once the first texture fully moves off-screen
+            if (yPos <= -700) {
+                yPos += 700; // Make the second texture take over seamlessly
+            }
+        }
+    }
+
+    void renderAnimatedBackgroundGray(LTimer &countdown, int &yPos) {
+        int moveDistance = 10; // Move the texture up, making it appear like the background moves downward
+
+        if (countdown.getTicks() % 1000 < 12.3) {
+            yPos -= moveDistance; // Move texture upward
+
+            // Render first texture
+            renderTexture(animatedBackgroundGray, 0, yPos);
+
+            // Render second texture to create a smooth transition
+            renderTexture(animatedBackgroundGray, 0, yPos + 700);
+
+            // Reset once the first texture fully moves off-screen
+            if (yPos <= -700) {
+                yPos += 700; // Make the second texture take over seamlessly
+            }
+        }
+    }
+
      void render(const Lightsout& game) {
-        prepareScene(backgroundTestTwo);
+         prepareScene(backgroundTestTwo);
         if (game.haveWon){
-            renderTexture(CongratulationText, 9, 8);
-            renderTexture(ReplayTheGame, 70, 146);
+            prepareScene(blackBackground);
+            if (game.HardModeLost) {renderTexture(loseText, 25, 8);}
+            else renderTexture(CongratulationText, 9, 8);
+            renderTexture(ReplayTheGame, 53, 146);
             renderTexture(BackToTitle, 30, 284);
-            cout << " You should be able to see this message after beating the game (and all other supporting graphics)." << endl;
+            cout << " You should be able to see this message after finishing the game." << endl;
             presentScene();
         } else {
              for (int i = 0; i < BOARD_SIZE; i++)
@@ -271,6 +322,7 @@ struct Graphics {
                     };
                 };
             if (game.hintNumbers == 0) {
+                cout << "You are out of hints!";
                 renderTexture(outOfHint, 10, 10*2 + CELL_SIZE*BOARD_SIZE);
             } else {
                 renderTexture(helpBox, 10, 10*2 + CELL_SIZE*BOARD_SIZE);
@@ -293,12 +345,14 @@ struct Graphics {
 
      void renderHardMode (const Lightsout &game){
         if (game.haveWon){
-            renderTexture(CongratulationText, 9, 8);
+            if (game.HardModeLost) {renderTexture(loseText, 25, 8);}
+            else renderTexture(CongratulationText, 9, 8);
             renderTexture(ReplayTheGame, 70, 146);
             renderTexture(BackToTitle, 30, 284);
             cout << " You should be able to see this message after beating the game (and all other supporting graphics)." << endl;
             presentScene();
         } else {
+            renderTexture(boxHardMode, 10, 10*2 + CELL_SIZE*BOARD_SIZE);
              for (int i = 0; i < BOARD_SIZE; i++)
                 for (int j = 0; j < BOARD_SIZE; j++) {
                     int x = BOARD_X + j * CELL_SIZE;
@@ -313,17 +367,19 @@ struct Graphics {
         }
 
      void renderReplay (const Lightsout& game){
-        prepareScene(backgroundTestTwo);
-        renderTexture(CongratulationText, 9, 8);
-        renderTexture(ReplayTheGameYellow, 70, 146);
+        prepareScene(blackBackground);
+        if (game.HardModeLost) {renderTexture(loseText, 25, 8);}
+            else renderTexture(CongratulationText, 9, 8);
+        renderTexture(ReplayTheGameYellow, 53, 146);
         renderTexture(BackToTitle, 30, 284);
         presentScene();
      }
 
      void renderBackToTitle (const Lightsout& game){
-        prepareScene(backgroundTestTwo);
-        renderTexture(CongratulationText, 9, 8);
-        renderTexture(ReplayTheGame, 70, 146);
+        prepareScene(blackBackground);
+        if (game.HardModeLost) {renderTexture(loseText, 25, 8);}
+            else renderTexture(CongratulationText, 9, 8);
+        renderTexture(ReplayTheGame, 53, 146);
         renderTexture(BackToTitleYellow, 30, 282);
         presentScene();
      }
@@ -356,20 +412,24 @@ struct Graphics {
     }
 
     void renderHardModeIntro (){
-        prepareScene(backgroundTestTwo);
-        renderTexture(HardModeIntro5, 0, 0);
+        prepareScene(HardModeIntro);
+        renderTexture(Intro5, 0, 0);
         presentScene();
         SDL_Delay(1000);
-        renderTexture(HardModeIntro4, 0, 0);
+        prepareScene(HardModeIntro);
+        renderTexture(Intro4, 0, 0);
         presentScene();
         SDL_Delay(1000);
-        renderTexture(HardModeIntro3, 0, 0);
+        prepareScene(HardModeIntro);
+        renderTexture(Intro3, 0, 0);
         presentScene();
         SDL_Delay(1000);
-        renderTexture(HardModeIntro2, 0, 0);
+        prepareScene(HardModeIntro);
+        renderTexture(Intro2, 0, 0);
         presentScene();
         SDL_Delay(1000);
-        renderTexture(HardModeIntro1, 0, 0);
+        prepareScene(HardModeIntro);
+        renderTexture(Intro1, 0, 0);
         presentScene();
         SDL_Delay(1000);
     }
