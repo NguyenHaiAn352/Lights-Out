@@ -17,10 +17,13 @@
 SOURCES AND CREDITS:
     - Sprites and/or Images:
         + Blocks: LTNC.docx's Tic-tac-toe.
-    - Audios:
+    - Audios and/or Sound Effects:
         + Title: Safe Space - ThatOneMTFGuy.
-        + Normal Gamemode: Resting Place - ThatOneMTFGuy.
-        + Hard Gamemode: Eternal Hope, Eternal Fight - ThatOneMTFGuy.
+        + Normal Gamemode: Sundowner - Key After Key
+        + Hard Gamemode: Eternal Hope, Eternal Fight - Exedious.
+        + Clock Tick: https://www.youtube.com/watch?v=G5NyXL47S74 & Creative Common Licenses.
     - Codes:
         + Bases of graphics.h, logic.h and a part of main.cpp: LTNC.docx.
         + Timer logic: LazyFoo's SDL Tutorial.
+    - Font:
+        + DK Cool Crayon: David Kerchoff - Hanoded Fonts License & FAQ.
