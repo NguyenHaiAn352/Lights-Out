@@ -276,8 +276,8 @@ void HardMode(Graphics &graphics, Lightsout &game, bool &isInSession) {
     TTF_CloseFont(font);
 
     if (quit) {
-        SDL_Quit();  // Cleanly shut down SDL before exiting
-        return;  // Exit function immediately
+        SDL_Quit();
+        return;
     }
 
     if (countdown.getTicks() > 73000) {

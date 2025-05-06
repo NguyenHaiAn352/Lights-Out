@@ -19,7 +19,7 @@ SOURCES AND CREDITS:
         + Blocks: LTNC.docx's Tic-tac-toe.
     - Audios and/or Sound Effects:
         + Title: Safe Space - ThatOneMTFGuy.
-        + Normal Gamemode: Sundowner - Key After Key
+        + Normal Gamemode: Sundowner - Key After Key.
         + Hard Gamemode: Eternal Hope, Eternal Fight - Exedious.
         + Clock Tick: https://www.youtube.com/watch?v=G5NyXL47S74 & Creative Common Licenses.
     - Codes:
