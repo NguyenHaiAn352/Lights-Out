@@ -9,20 +9,23 @@
 #include "logic.h"
 #include <sstream>
 #include "timer.h"
+#include <cmath>
 
 struct Graphics {
     SDL_Renderer *renderer;
     SDL_Window *window;
-    SDL_Texture *cellEmpty, *helpBox, *lightOn, *outOfHint, *boxHardMode;
+    SDL_Texture *cellEmpty, *lightOn, *outOfHint, *boxHardMode, *newHintBox;
     SDL_Texture *zero, *one, *two, *three, *four, *five, *six, *seven, *eight, *nine;
     SDL_Texture *blackBackground, *backgroundTestTwo, *grayerBackground, *TitleScreen;
     SDL_Texture *spongebob;
     SDL_Texture *CongratulationText, *loseText, *ReplayTheGame, *ReplayTheGameYellow, *BackToTitle, *BackToTitleYellow;
-    SDL_Texture *LightsOutTitle, *StartTheGame, *StartTheGameYellow, *orButton, *PickTheHardMode, *PickTheHardModeYellow;
+    SDL_Texture *LightsOutTitle, *brighterLightsOutTitle, *StartTheGame, *StartTheGameYellow, *orButton, *PickTheHardMode, *PickTheHardModeYellow, *loseBackground, *winBackground;
     SDL_Texture *Intro5, *Intro4,*Intro3, *Intro2, *Intro1, *HardModeIntro;
     SDL_Texture *animatedBackgroundBlack, *animatedBackgroundGray;
+    SDL_Texture *starburstWatercolor;
     TTF_Font* font, *fontTwo;
     SDL_Color color;
+    const float FADE_DURATION = 1250.0f;
 //    SDL_Texture* congratText, *closeWindow, *closeWindowTwo;
 
     int initX = 0, initY = 0;
@@ -69,9 +72,14 @@ struct Graphics {
 
     void init(){
         initSDL();
+        starburstWatercolor = loadTexture("images//starburstWatercolor.png");
+        brighterLightsOutTitle = loadTexture("images//brighterTitleScreen.png");
         spongebob = loadTexture("images//Spongebob.png");
 //        font = loadFont("assets/DKCoolCrayon.ttf", 30);
 //        fontTwo = loadFont("assets/DKCoolCrayon.ttf", 15);
+        loseBackground = loadTexture("images//loseBackground.png");
+        winBackground = loadTexture("images//winBackground.png");
+        newHintBox = loadTexture("images//HintBox.png");
         animatedBackgroundBlack = loadTexture("images//animatedBackgroundBlack.png");
         animatedBackgroundGray = loadTexture("images//animatedBackgroundGray.png");
         loseText = loadTexture("texts//LoseText.png");
@@ -90,7 +98,6 @@ struct Graphics {
         color = {219, 219, 219, 0};
         cellEmpty = loadTexture("images//cell_empty.png");
         lightOn = loadTexture("images//light_on.png");
-        helpBox = loadTexture("images//hint.png");
         outOfHint = loadTexture("images//OutOfHint.png");
         zero = loadTexture("images//zero.png");
         one = loadTexture("images//one.png");
@@ -114,7 +121,7 @@ struct Graphics {
         grayerBackground = loadTexture("images//grayerbackground.png");
         SDL_SetTextureBlendMode(blackBackground, SDL_BLENDMODE_MOD);
         SDL_SetTextureAlphaMod(blackBackground, 255);
-
+        SDL_SetTextureBlendMode(starburstWatercolor, SDL_BLENDMODE_MOD);
     }
 
     TTF_Font* loadFont(const char* path, int size)
@@ -125,6 +132,7 @@ struct Graphics {
                            SDL_LOG_PRIORITY_ERROR,
                            "Load font %s", TTF_GetError());
         }
+        return gFont;
     }
 
     void prepareScene(SDL_Texture * background)
@@ -207,6 +215,10 @@ struct Graphics {
     }
 
     void quit() {
+        SDL_DestroyTexture(starburstWatercolor); starburstWatercolor = nullptr;
+        SDL_DestroyTexture(loseBackground); loseBackground = nullptr;
+        SDL_DestroyTexture(winBackground); winBackground = nullptr;
+        SDL_DestroyTexture(newHintBox); newHintBox = nullptr;
         SDL_DestroyTexture(animatedBackgroundBlack); animatedBackgroundBlack = nullptr;
         SDL_DestroyTexture(animatedBackgroundGray); animatedBackgroundGray = nullptr;
         SDL_DestroyTexture(loseText); loseText = nullptr;
@@ -219,6 +231,7 @@ struct Graphics {
         SDL_DestroyTexture(zero); zero = nullptr;
         SDL_DestroyTexture(cellEmpty); cellEmpty = nullptr;
         SDL_DestroyTexture(lightOn); lightOn = nullptr;
+        SDL_DestroyTexture(outOfHint); outOfHint = nullptr;
         SDL_DestroyTexture(one); one = nullptr;
         SDL_DestroyTexture(two); two = nullptr;
         SDL_DestroyTexture(three); three = nullptr;
@@ -232,6 +245,19 @@ struct Graphics {
         SDL_DestroyTexture(backgroundTestTwo); backgroundTestTwo = nullptr;
         SDL_DestroyTexture(boxHardMode); boxHardMode = nullptr;
         SDL_DestroyTexture(grayerBackground); grayerBackground = nullptr;
+        SDL_DestroyTexture(TitleScreen); TitleScreen = nullptr;
+        SDL_DestroyTexture(CongratulationText); CongratulationText = nullptr;
+        SDL_DestroyTexture(ReplayTheGame); ReplayTheGame = nullptr;
+        SDL_DestroyTexture(ReplayTheGameYellow); ReplayTheGameYellow = nullptr;
+        SDL_DestroyTexture(BackToTitle); BackToTitle = nullptr;
+        SDL_DestroyTexture(BackToTitleYellow); BackToTitleYellow = nullptr;
+        SDL_DestroyTexture(LightsOutTitle); LightsOutTitle = nullptr;
+        SDL_DestroyTexture(brighterLightsOutTitle); brighterLightsOutTitle = nullptr;
+        SDL_DestroyTexture(StartTheGame); StartTheGame = nullptr;
+        SDL_DestroyTexture(StartTheGameYellow); StartTheGameYellow = nullptr;
+        SDL_DestroyTexture(orButton); orButton = nullptr;
+        SDL_DestroyTexture(PickTheHardMode); PickTheHardMode = nullptr;
+        SDL_DestroyTexture(PickTheHardModeYellow); PickTheHardModeYellow = nullptr;
         TTF_CloseFont(font);
         IMG_Quit();
         TTF_Quit();
@@ -263,6 +289,26 @@ struct Graphics {
         return texture;
     }
 
+//    void renderStarburst(LTimer &countdown, Uint32 startTime){
+//        Uint32 currentTime = countdown.getTicks();
+//        float elapsed = fmod(currentTime - startTime, FADE_DURATION) / FADE_DURATION;
+//        Uint8 alphaValue;
+//        if (elapsed < 0.25f) {
+//            alphaValue = 255;
+//        } else {
+//            float fadeFactor = (1.0f - ((elapsed - 0.25f) / 0.75f));
+//            alphaValue = static_cast<Uint8>(255 * fadeFactor);
+//        }
+//        SDL_SetTextureAlphaMod(starburstWatercolor, alphaValue);
+//        renderTexture(starburstWatercolor, 0, 0);
+//    }
+
+//    void animatedTitleBackground(){
+//        srand(time(0));
+//        if (rand() % 10 == 7 || rand() % 10 == 5) {prepareScene(brighterLightsOutTitle);}
+//        else prepareScene(TitleScreen);
+//    }
+
     void renderAnimatedBackgroundBlack(LTimer &countdown, int &yPos) {
         int moveDistance = 10; // Move the texture up, making it appear like the background moves downward
 
@@ -283,9 +329,9 @@ struct Graphics {
     }
 
     void renderAnimatedBackgroundGray(LTimer &countdown, int &yPos) {
-        int moveDistance = 10; // Move the texture up, making it appear like the background moves downward
+        int moveDistance = 5; // Move the texture up, making it appear like the background moves downward
 
-        if (countdown.getTicks() % 1000 < 12.3) {
+        if (countdown.getTicks() % 2000 < 12.2) {
             yPos -= moveDistance; // Move texture upward
 
             // Render first texture
@@ -301,10 +347,11 @@ struct Graphics {
         }
     }
 
-     void render(const Lightsout& game) {
-         prepareScene(backgroundTestTwo);
+    void render(const Lightsout& game) {
+//         prepareScene(backgroundTestTwo);
         if (game.haveWon){
-            prepareScene(blackBackground);
+            if (game.HardModeLost) {prepareScene(loseBackground);}
+            else prepareScene(winBackground);
             if (game.HardModeLost) {renderTexture(loseText, 25, 8);}
             else renderTexture(CongratulationText, 9, 8);
             renderTexture(ReplayTheGame, 53, 146);
@@ -325,7 +372,7 @@ struct Graphics {
                 cout << "You are out of hints!";
                 renderTexture(outOfHint, 10, 10*2 + CELL_SIZE*BOARD_SIZE);
             } else {
-                renderTexture(helpBox, 10, 10*2 + CELL_SIZE*BOARD_SIZE);
+                renderTexture(newHintBox, 10, 10*2 + CELL_SIZE*BOARD_SIZE);
                 switch(game.hintPosition){
                     case 0: renderTexture(zero, 10 + 160, 10 + 240 + 10); break;
                     case 1: renderTexture(one, 10 + 160, 10 + 240 + 10); break;
@@ -337,13 +384,21 @@ struct Graphics {
                     case 7: renderTexture(seven, 10 + 160, 10 + 240 + 10); break;
                     case 8: renderTexture(eight, 10 + 160, 10 + 240 + 10); break;
                     case 9: renderTexture(nine, 10 + 160, 10 + 240 + 10); break;
-            }
+                }
+                stringstream hintInfo;
+                hintInfo.str("");
+                hintInfo << game.hintNumbers -1;
+                string hintInfoString = hintInfo.str();
+                TTF_Font *font = loadFont("assets/DKCoolCrayon.ttf", 27);
+                SDL_Color color = {100, 100, 100, 0};
+                SDL_Texture *hintNumbersLeft = renderText(hintInfoString.c_str(), font, color);
+                renderTexture(hintNumbersLeft, 135, 300);
             }
             presentScene();
         }
      }
 
-     void renderHardMode (const Lightsout &game){
+    void renderHardMode (const Lightsout &game){
         if (game.haveWon){
             if (game.HardModeLost) {renderTexture(loseText, 25, 8);}
             else renderTexture(CongratulationText, 9, 8);
@@ -366,8 +421,9 @@ struct Graphics {
             presentScene();
         }
 
-     void renderReplay (const Lightsout& game){
-        prepareScene(blackBackground);
+    void renderReplay (const Lightsout& game){
+        if (game.HardModeLost) {prepareScene(loseBackground);}
+            else prepareScene(winBackground);
         if (game.HardModeLost) {renderTexture(loseText, 25, 8);}
             else renderTexture(CongratulationText, 9, 8);
         renderTexture(ReplayTheGameYellow, 53, 146);
@@ -375,8 +431,9 @@ struct Graphics {
         presentScene();
      }
 
-     void renderBackToTitle (const Lightsout& game){
-        prepareScene(blackBackground);
+    void renderBackToTitle (const Lightsout& game){
+        if (game.HardModeLost) {prepareScene(loseBackground);}
+            else prepareScene(winBackground);
         if (game.HardModeLost) {renderTexture(loseText, 25, 8);}
             else renderTexture(CongratulationText, 9, 8);
         renderTexture(ReplayTheGame, 53, 146);
@@ -384,7 +441,7 @@ struct Graphics {
         presentScene();
      }
 
-     void renderTitle (const Lightsout & game){
+    void renderTitle (const Lightsout & game){
         prepareScene(TitleScreen);
         renderTexture(LightsOutTitle, 25, 19);
         renderTexture (StartTheGame, 50, 120);
@@ -394,7 +451,7 @@ struct Graphics {
     }
 
     void renderTitleYellow (const Lightsout & game){
-        prepareScene(TitleScreen);
+        prepareScene(brighterLightsOutTitle);
         renderTexture(LightsOutTitle, 25, 19);
         renderTexture (StartTheGameYellow, 50, 120);
         renderTexture (orButton, 112, 252);
@@ -402,8 +459,8 @@ struct Graphics {
         presentScene();
      }
 
-     void renderTitleHardModeYellow (const Lightsout & game){
-        prepareScene(TitleScreen);
+    void renderTitleHardModeYellow (const Lightsout & game){
+        prepareScene(brighterLightsOutTitle);
         renderTexture(LightsOutTitle, 25, 19);
         renderTexture (StartTheGame, 50, 120);
         renderTexture (orButton, 112, 252);

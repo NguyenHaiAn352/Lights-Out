@@ -136,16 +136,27 @@ void NormalGame (Graphics &graphics, Lightsout &game, bool &isInSession){
     cout << "normal game was triggered.";
     Mix_HaltMusic();
     int x, y; bool quit = false;
-    // int yPos = 0;
+     int yPos = 0;
     Mix_Music *bgMusic = graphics.loadMusic("audio\\sundowner.mp3");
     SDL_Event event;
     gameProgressReset(game);
     graphics.render(game);
-//    LTimer countdown;
-//    countdown.start();
+    LTimer countdown;
+    countdown.start();
     while (!quit) { // Normal Game.
         graphics.play(bgMusic);
 		SDL_PollEvent(&event);
+		graphics.renderAnimatedBackgroundGray(countdown, yPos);
+		graphics.render(game);
+//		stringstream hintInfo;
+//		hintInfo.str("");
+//		hintInfo << game.hintNumbers -1;
+//		string hintInfoString = hintInfo.str();
+//		TTF_Font *font = graphics.loadFont("assets/DKCoolCrayon.ttf", 27);
+//        SDL_Color color = {255, 255, 255, 0};
+//        SDL_Texture *hintNumbersLeft = graphics.renderText(hintInfoString.c_str(), font, color);
+//        graphics.renderTexture(hintNumbersLeft, 55, 250);
+
         switch (event.type) {
             case SDL_QUIT:
                 quit = true;
@@ -155,17 +166,19 @@ void NormalGame (Graphics &graphics, Lightsout &game, bool &isInSession){
                 processClick(x, y, game);
                 graphics.render(game);
                 if (game.haveWon){
+//                    SDL_DestroyTexture(hintNumbersLeft); hintNumbersLeft = nullptr;
                     Mix_HaltMusic();
                     EndScreen(graphics, game, isInSession);
                     quit = true;
                 }
                 break;
 		}
-        SDL_Delay(30);
+//        SDL_Delay(30);
     }
     if (quit) {
         SDL_Quit();  // Cleanly shut down SDL before exiting
         return;  // Exit function immediately
+//        SDL_DestroyTexture(hintNumbersLeft); hintNumbersLeft = nullptr;
     }
     Mix_FreeMusic(bgMusic);
 }
@@ -194,10 +207,10 @@ void HardMode(Graphics &graphics, Lightsout &game, bool &isInSession) {
     countdown.start();
     int yPos = 0;
     Uint32 startTime = SDL_GetTicks();
-    float pulseDuration = 1250.0f; // 1.25s cycle
 
     while (!quit && countdown.getTicks() <= 73000 && !winningTheGame) {
         graphics.renderAnimatedBackgroundBlack(countdown, yPos);
+//        graphics.renderStarburst(countdown, startTime);
 
         timeText.str("");
         moveText.str("");
@@ -212,13 +225,16 @@ void HardMode(Graphics &graphics, Lightsout &game, bool &isInSession) {
         SDL_Texture *moveLeft = graphics.renderText("Moves Left: ", font, color);
 
         countdownText = graphics.renderText(timeTextInString.c_str(), font, color);
-        moveLeftTexture = graphics.renderText(moveTextInString.c_str(), font, color);
+        if (game.HardModeMoves == 0) moveLeftTexture = graphics.renderText(moveTextInString.c_str(), font, redColor);
+        else moveLeftTexture = graphics.renderText(moveTextInString.c_str(), font, color);
 
         graphics.play(bgMusic);
 
         while (SDL_PollEvent(&event)) {  // Ensure all events are processed
             if (event.type == SDL_QUIT) {
                 quit = true; // Stop the loop
+                SDL_DestroyTexture(countdownText0); countdownText0 = nullptr;
+                SDL_DestroyTexture(moveLeft); moveLeft = nullptr;
                 break;
             }
             if (event.type == SDL_MOUSEBUTTONDOWN) {
@@ -228,6 +244,7 @@ void HardMode(Graphics &graphics, Lightsout &game, bool &isInSession) {
                 if (game.haveWon) {
                     countdown.stop();
                     winningTheGame = true;
+                    Mix_HaltMusic();
                     SDL_RenderClear(graphics.renderer);
                     EndScreenHardMode(graphics, game, isInSession);
                     break;
@@ -252,6 +269,12 @@ void HardMode(Graphics &graphics, Lightsout &game, bool &isInSession) {
         SDL_DestroyTexture(moveLeft); moveLeft = nullptr;
     }
 
+    Mix_FreeMusic(bgMusic);
+    Mix_FreeChunk(clockTick);
+    SDL_DestroyTexture(countdownText); countdownText = nullptr;
+    SDL_DestroyTexture(moveLeftTexture); moveLeftTexture = nullptr;
+    TTF_CloseFont(font);
+
     if (quit) {
         SDL_Quit();  // Cleanly shut down SDL before exiting
         return;  // Exit function immediately
@@ -261,12 +284,6 @@ void HardMode(Graphics &graphics, Lightsout &game, bool &isInSession) {
         game.HardModeLost = true;
         LoseScreen(graphics, game, isInSession);
     }
-
-    Mix_FreeMusic(bgMusic);
-    Mix_FreeChunk(clockTick);
-    SDL_DestroyTexture(countdownText); countdownText = nullptr;
-    SDL_DestroyTexture(moveLeftTexture); moveLeftTexture = nullptr;
-    TTF_CloseFont(font);
 }
 void EndScreen (Graphics &graphics, Lightsout &game, bool &isInSession){
     Mix_Chunk *yippie = graphics.loadSoundEffect("audio\\yippie.wav");
@@ -299,7 +316,6 @@ void EndScreen (Graphics &graphics, Lightsout &game, bool &isInSession){
 }
 void EndScreenHardMode (Graphics &graphics, Lightsout &game, bool &isInSession){
     Mix_Chunk *yippie = graphics.loadSoundEffect("audio\\yippie.wav");
-    Mix_Music *TitleMusic = graphics.loadMusic("audio\\safe_space.mp3");
     Mix_PlayChannel(-1, yippie, 0);
     graphics.render(game);
     bool isInEndScreen = true; SDL_Event event;
@@ -315,9 +331,9 @@ void EndScreenHardMode (Graphics &graphics, Lightsout &game, bool &isInSession){
             } else if (isInBackToTitle(graphics, game)) {
                 isInEndScreen = false;
                 isInSession = false;
-                cout << "No Longer In End Screen!" << endl;
-                graphics.prepareScene(graphics.blackBackground);
                 graphics.renderTitle(game);
+                gameLoop(graphics, game);
+                cout << "No Longer In End Screen!" << endl;
                 break;
             }
         }
@@ -340,6 +356,8 @@ void LoseScreen(Graphics &graphics, Lightsout &game, bool &isInSession){
             } else if (isInBackToTitle(graphics, game)) {
                 isInEndScreen = false;
                 isInSession = false;
+                graphics.renderTitle(game);
+                gameLoop(graphics, game);
                 cout << "No Longer In End Screen!" << endl;
                 break;
             }
@@ -364,10 +382,10 @@ void gameLoop (Graphics &graphics, Lightsout &game){
     // renderTitleScreen
     // if HardMode: void HardMode, if NormalMode: void NormalMode, if quit: quit
     bool quit = false; bool isInSession = false;
-    int x, y;
     SDL_Event event;
     Mix_Music *TitleMusic = graphics.loadMusic("audio\\safe_space.mp3");
     graphics.play(TitleMusic);
+
     while (!quit){
             if(!(SDL_PollEvent(&event))) {continue;}
             if (event.type == SDL_QUIT) {quit = true;}
@@ -387,14 +405,6 @@ int main(int argc, char *argv[]){
 	Graphics graphics;
    	graphics.init();
     Lightsout game;
-    Mix_Music *bgMusic = graphics.loadMusic("audio\\resting_place.mp3");
-	bool quit = false;
-	bool replay = true;
-	bool chooseToPlay = false;
-	bool chooseHardMode = false;
-	int x, y;
-	SDL_Event event;
-	SDL_Event event2;
 	graphics.renderTitle(game);
 	gameLoop(graphics, game);
    	graphics.quit();
