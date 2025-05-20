@@ -42,7 +42,7 @@ bool isInHardMode (Graphics &graphics, Lightsout &game) {
     return (x >= 25 && y >= 290) && (x <= 234 && y <= 320);
 }
 
-void waitUntilKeyPressed(){ //pause coding until key being pressed
+void waitUntilKeyPressed(){
     SDL_Event e;
     while (true) {
         if ( SDL_PollEvent(&e) != 0 &&
@@ -102,9 +102,6 @@ void gameProgressResetHard (Lightsout &game) {
 }
 
 void waitForReplayResponse(Graphics &graphics, Lightsout &game){
-    // If mouse is on the surface of text, make it yellow
-    // Else return it back to black
-    // If clicked, proceed; Else stay in a loop
     int x; int y;
     SDL_GetMouseState(&x, &y);
     if ((x >= 73 && y >= 145) && (x <= 188 && y <= 194)){
@@ -210,7 +207,6 @@ void HardMode(Graphics &graphics, Lightsout &game, bool &isInSession) {
 
     while (!quit && countdown.getTicks() <= 73000 && !winningTheGame) {
         graphics.renderAnimatedBackgroundBlack(countdown, yPos);
-//        graphics.renderStarburst(countdown, startTime);
 
         timeText.str("");
         moveText.str("");
@@ -230,9 +226,9 @@ void HardMode(Graphics &graphics, Lightsout &game, bool &isInSession) {
 
         graphics.play(bgMusic);
 
-        while (SDL_PollEvent(&event)) {  // Ensure all events are processed
+        while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
-                quit = true; // Stop the loop
+                quit = true;
                 SDL_DestroyTexture(countdownText0); countdownText0 = nullptr;
                 SDL_DestroyTexture(moveLeft); moveLeft = nullptr;
                 break;
@@ -379,8 +375,6 @@ void DetectTitleScreenState(Graphics &graphics, Lightsout &game) {
     SDL_Delay(30);
 }
 void gameLoop (Graphics &graphics, Lightsout &game){
-    // renderTitleScreen
-    // if HardMode: void HardMode, if NormalMode: void NormalMode, if quit: quit
     bool quit = false; bool isInSession = false;
     SDL_Event event;
     Mix_Music *TitleMusic = graphics.loadMusic("audio\\safe_space.mp3");
@@ -401,7 +395,6 @@ void gameLoop (Graphics &graphics, Lightsout &game){
 }
 
 int main(int argc, char *argv[]){
-	// Initialization
 	Graphics graphics;
    	graphics.init();
     Lightsout game;

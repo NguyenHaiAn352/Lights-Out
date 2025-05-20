@@ -26,7 +26,6 @@ struct Graphics {
     TTF_Font* font, *fontTwo;
     SDL_Color color;
     const float FADE_DURATION = 1250.0f;
-//    SDL_Texture* congratText, *closeWindow, *closeWindowTwo;
 
     int initX = 0, initY = 0;
     int movingX = 10; int movingY = 10;
@@ -288,26 +287,6 @@ struct Graphics {
         SDL_FreeSurface( textSurface );
         return texture;
     }
-
-//    void renderStarburst(LTimer &countdown, Uint32 startTime){
-//        Uint32 currentTime = countdown.getTicks();
-//        float elapsed = fmod(currentTime - startTime, FADE_DURATION) / FADE_DURATION;
-//        Uint8 alphaValue;
-//        if (elapsed < 0.25f) {
-//            alphaValue = 255;
-//        } else {
-//            float fadeFactor = (1.0f - ((elapsed - 0.25f) / 0.75f));
-//            alphaValue = static_cast<Uint8>(255 * fadeFactor);
-//        }
-//        SDL_SetTextureAlphaMod(starburstWatercolor, alphaValue);
-//        renderTexture(starburstWatercolor, 0, 0);
-//    }
-
-//    void animatedTitleBackground(){
-//        srand(time(0));
-//        if (rand() % 10 == 7 || rand() % 10 == 5) {prepareScene(brighterLightsOutTitle);}
-//        else prepareScene(TitleScreen);
-//    }
 
     void renderAnimatedBackgroundBlack(LTimer &countdown, int &yPos) {
         int moveDistance = 10; // Move the texture up, making it appear like the background moves downward
